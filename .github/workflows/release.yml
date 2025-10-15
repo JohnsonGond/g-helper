@@ -50,9 +50,9 @@ jobs:
       run: |
         gh release upload ${{ github.ref_name }} app/bin/x64/Release/net8.0-windows/win-x64/publish/GHelper.exe
 
-    - name: Generate SLSA build provenance attestation
-      uses: actions/attest-build-provenance@v2
-      with:
-        subject-path: |
-          ./signed/GHelper.exe
-          ./signed/GHelper.zip
+    # - name: Generate SLSA build provenance attestation
+    #   uses: actions/attest-build-provenance@v2
+    #   with:
+    #     subject-path: |
+    #       ./signed/GHelper.exe
+    #       ./signed/GHelper.zip
