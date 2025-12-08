@@ -1334,13 +1334,17 @@ namespace GHelper
                 buttonFHD.Text = fhd > 0 ? "FHD" : "UHD";
             }
 
+            bool hdrControlVisible = (hdr && hdrControl >= 0);
+
             if (miniled1 >= 0)
             {
+                buttonMiniled.Visible = !hdrControlVisible;
                 buttonMiniled.Enabled = !hdr;
                 buttonMiniled.Activated = miniled1 == 1 || hdr;
             }
             else if (miniled2 >= 0)
             {
+                buttonMiniled.Visible = !hdrControlVisible;
                 buttonMiniled.Enabled = !hdr;
                 if (hdr) miniled2 = 1; // Show HDR as Multizone Strong
 
@@ -1371,12 +1375,14 @@ namespace GHelper
                 buttonMiniled.Visible = false;
             }
 
-            if (hdr && hdrControl >= 0)
+            if (hdrControlVisible)
             {
-                buttonMiniled.Visible = false;
                 buttonHDRControl.Visible = true;
                 buttonHDRControl.Activated = hdrControl > 0;
                 buttonHDRControl.BorderColor = colorTurbo;
+            } else
+            {
+                buttonHDRControl.Visible = false;
             }
 
             if (hdr) labelVisual.Text = Properties.Strings.VisualModesHDR;
@@ -1759,7 +1765,7 @@ namespace GHelper
                     buttonOptimized.BorderColor = colorStandard;
                     buttonStandard.Activated = !GPUAuto;
                     buttonOptimized.Activated = GPUAuto;
-                    labelGPU.Text = Properties.Strings.GPUMode + ": " + Properties.Strings.GPUModeStandard;
+                    labelGPU.Text = Properties.Strings.GPUMode + ": " + (AppConfig.IsAlwaysUltimate() ? Properties.Strings.GPUModeUltimate : Properties.Strings.GPUModeStandard);
                     panelGPU.AccessibleName = Properties.Strings.GPUMode + " - " + (GPUAuto ? Properties.Strings.Optimized : Properties.Strings.StandardMode);
                     break;
             }
