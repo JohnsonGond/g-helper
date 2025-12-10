@@ -110,15 +110,7 @@ namespace GHelper.Input
 
         public static void InitFNLock()
         {
-            if (AppConfig.ContainsModel("FA401KM"))
-            {
-                // Force F-Keys mode for FA401KM to enable software fallback
-                Program.acpi.DeviceSet(AsusACPI.FnLock, 1, "FnLockForceFKeys");
-            }
-            else if (IsHardwareFnLock())
-            {
-                HardwareFnLock(AppConfig.Is("fn_lock"));
-            }
+            if (IsHardwareFnLock()) HardwareFnLock(AppConfig.Is("fn_lock"));
         }
 
         public void InitBacklightTimer()
@@ -731,6 +723,8 @@ namespace GHelper.Input
 
         public static bool IsHardwareFnLock()
         {
+            if (AppConfig.ContainsModel("FA401KM")) return false;
+
             if (AppConfig.IsHardwareFnLock()) return true;
             if (_fnLock is null)
             {
