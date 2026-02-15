@@ -405,6 +405,11 @@ public static class AppConfig
         return ContainsModel("TUF") || ContainsModel("TX Gaming") || ContainsModel("TX Air");
     }
 
+    public static bool IsFA401()
+    {
+        return ContainsModel("FA401");
+    }
+
     public static bool IsProArt()
     {
         return ContainsModel("ProArt");
@@ -422,7 +427,7 @@ public static class AppConfig
 
     public static bool IsHardwareFnLock()
     {
-        return IsVivoZenPro() || ContainsModel("GZ302EA");
+        return (IsVivoZenPro() || ContainsModel("GZ302EA")) && !IsFA401();
     }
 
     // Devices with bugged bios command to change brightness
@@ -485,7 +490,7 @@ public static class AppConfig
 
     public static bool IsInvertedFNLock()
     {
-        return ContainsModel("M140") || ContainsModel("S550") || ContainsModel("P540") || IsTUF();
+        return (ContainsModel("M140") || ContainsModel("S550") || ContainsModel("P540") || IsTUF()) && !IsFA401();
     }
 
     public static bool IsOLED()
