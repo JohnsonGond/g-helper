@@ -485,6 +485,7 @@ public static class AppConfig
 
     public static bool IsInvertedFNLock()
     {
+        if (ContainsModel("FA401")) return false;
         return ContainsModel("M140") || ContainsModel("S550") || ContainsModel("P540") || IsTUF();
     }
 
