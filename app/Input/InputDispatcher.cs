@@ -727,6 +727,7 @@ namespace GHelper.Input
 
         public static bool IsHardwareFnLock()
         {
+            if (AppConfig.ContainsModel("FA401")) return false;
             if (AppConfig.IsHardwareFnLock()) return true;
             if (_fnLock is null)
             {
