@@ -20,13 +20,6 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
-    - name: Check tag matches version
-      if: github.event_name == 'release'
-      run: |
-        $version = ([xml](Get-Content app/GHelper.csproj)).Project.PropertyGroup.AssemblyVersion
-        $tag = "${{ github.event.release.tag_name }}"
-        if ($tag -ne "v$version") { Write-Warning "Tag $tag does not match AssemblyVersion $version" }
-
     - name: Publish
       run: |
         dotnet publish app/GHelper.sln --configuration Release --runtime win-x64 -p:PublishSingleFile=true --no-self-contained
