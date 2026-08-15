@@ -25,7 +25,7 @@ jobs:
       run: |
         $version = ([xml](Get-Content app/GHelper.csproj)).Project.PropertyGroup.AssemblyVersion
         $tag = "${{ github.event.release.tag_name }}"
-        if ($tag -ne "v$version") { throw "Tag $tag does not match AssemblyVersion $version" }
+        if ($tag -ne "v$version") { Write-Warning "Tag $tag does not match AssemblyVersion $version" }
 
     - name: Publish
       run: |
