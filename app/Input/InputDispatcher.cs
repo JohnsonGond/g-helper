@@ -2,6 +2,7 @@ using GHelper.Display;
 using GHelper.Helpers;
 using GHelper.Mode;
 using GHelper.Peripherals;
+using GHelper.Peripherals.Keyboard;
 using GHelper.Peripherals.Mouse;
 using GHelper.USB;
 using Microsoft.Win32;
@@ -221,6 +222,10 @@ namespace GHelper.Input
             foreach (ushort code in GetActiveMouseComboCarriers())
                 hook.RegisterHotKey(ModifierKeys.None, Keys.F13 + (code - 0x0068));
 
+            for (int slot = 0; slot < AsusKeyboard.LaunchSlots; slot++)
+                if (AsusKeyboard.LaunchCommand(slot).Length > 0)
+                    hook.RegisterHotKey(ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt, Keys.F1 + slot);
+
         }
 
         private static IEnumerable<ushort> GetActiveMouseComboCarriers()
@@ -331,6 +336,17 @@ namespace GHelper.Input
         {
 
             Logger.WriteLine(e.Key.ToString() + " " + e.Modifier.ToString());
+
+            if (e.Modifier == (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt)
+                && e.Key >= Keys.F1 && e.Key < Keys.F1 + AsusKeyboard.LaunchSlots)
+            {
+                string command = AsusKeyboard.LaunchCommand(e.Key - Keys.F1);
+                if (command.Length > 0)
+                {
+                    LaunchProcess(command);
+                    return;
+                }
+            }
 
             if (e.Modifier == ModifierKeys.None)
             {
@@ -711,7 +727,12 @@ namespace GHelper.Input
         static void MuteLED()
         {
             Thread.Sleep(500);
-            Program.acpi.DeviceSet(AsusACPI.SoundMuteLed, Audio.IsMuted() ? 1 : 0, "SoundLed");
+            MuteLED(Audio.IsMuted());
+        }
+
+        static void MuteLED(bool muted)
+        {
+            Program.acpi.DeviceSet(AsusACPI.SoundMuteLed, muted ? 1 : 0, "SoundLed");
         }
 
         static void ToggleTouchScreen()
@@ -736,7 +757,7 @@ namespace GHelper.Input
         {
             if (!AppConfig.IsVivoZenbook()) return;
             if (Program.acpi.IsSupported(AsusACPI.MicMuteLed)) Program.acpi.DeviceSet(AsusACPI.MicMuteLed, Audio.IsMicMuted() ? 1 : 0, "MicmuteLedInit");
-            if (Program.acpi.IsSupported(AsusACPI.SoundMuteLed)) Program.acpi.DeviceSet(AsusACPI.SoundMuteLed, Audio.IsMuted() ? 1 : 0, "SoundLedInit");
+            if (Program.acpi.IsSupported(AsusACPI.SoundMuteLed)) Audio.SubscribeMute(MuteLED);
         }
 
         static bool GetTouchpadState()
@@ -1253,11 +1274,11 @@ namespace GHelper.Input
             AppConfig.Set("camera_status", status);
             if (toast)
             {
-                string statusText = cameraLedStatus switch
+                string statusText = status switch
                 {
                     0 => "On",
                     1 => "Off",
-                    _ => status switch
+                    _ => cameraLedStatus switch
                     {
                         0 => "On",
                         1 => "Off",
